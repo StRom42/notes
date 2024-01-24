@@ -17,22 +17,22 @@
             android:id="@+id/add_note_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="ADD NOTE"/>
+            android:text="ADD"/>
         <Button
             android:id="@+id/delete_note_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="DELETE NOTE"/>
+            android:text="DELETE"/>
         <Button
             android:id="@+id/edit_note_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="EDIT NOTE"/>
+            android:text="EDIT NAME"/>
         <Button
             android:id="@+id/restore_note_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="RESTORE NOTE"/>
+            android:text="RESTORE"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

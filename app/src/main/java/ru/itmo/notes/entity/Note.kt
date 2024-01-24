@@ -5,15 +5,15 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import ru.itmo.notes.enums.NodeStatus
-import ru.itmo.notes.enums.NoteNodeType
+import ru.itmo.notes.enums.NodeType
 
 @Entity(tableName = "NOTE_TAB")
 data class Note (
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
 
-    @ColumnInfo(name = "dir_id")
-    var dirId: Long,
+    @ColumnInfo(name = "folder_id")
+    var folderId: Long,
 
     @ColumnInfo(name = "status")
     var status: String = NodeStatus.ACTIVE.name,
@@ -35,6 +35,6 @@ data class Note (
     override fun title() = title
 
     @Ignore
-    override fun type() = NoteNodeType.NOTE
+    override fun type() = NodeType.NOTE
 
 }

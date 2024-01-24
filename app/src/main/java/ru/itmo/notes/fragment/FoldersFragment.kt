@@ -20,20 +20,20 @@ import ru.itmo.notes.R
 import ru.itmo.notes.common.alert
 import ru.itmo.notes.common.replaceFragment
 import ru.itmo.notes.config.DatabaseConfig
-import ru.itmo.notes.entity.Directory
+import ru.itmo.notes.entity.Folder
 import ru.itmo.notes.entity.NoteNode
 import ru.itmo.notes.enums.NodeStatus
-import ru.itmo.notes.enums.NoteNodeType
+import ru.itmo.notes.enums.NodeType
 import ru.itmo.notes.view.NotesAdapter
 
 
-class DirsFragment(
+class FoldersFragment(
     db: DatabaseConfig? = null
 ): Fragment() {
 
     private lateinit var db: DatabaseConfig
     private lateinit var recyclerView: RecyclerView
-    private lateinit var dirsAdapter: NotesAdapter
+    private lateinit var foldersAdapter: NotesAdapter
 
     init {
         if (db != null) {
@@ -66,14 +66,14 @@ class DirsFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        dirsAdapter = NotesAdapter(mutableListOf()) { node -> onDirClick(node) }
-        recyclerView.adapter = dirsAdapter
+        foldersAdapter = NotesAdapter(mutableListOf()) { node -> onFolderClick(node) }
+        recyclerView.adapter = foldersAdapter
 
         recyclerView.layoutManager = StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL)
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val dirs = db.directoryRepository().findAllByStatus(NodeStatus.ACTIVE.name)
-            dirsAdapter.setData(dirs)
+            val dirs = db.folderRepository().findAllByStatus(NodeStatus.ACTIVE.name)
+            foldersAdapter.setData(dirs)
         }
 
 
@@ -87,8 +87,8 @@ class DirsFragment(
         super.onSaveInstanceState(outState)
     }
 
-    private fun onDirClick(noteNode: NoteNode, ) {
-        if (noteNode.type() == NoteNodeType.DIRECTORY) {
+    private fun onFolderClick(noteNode: NoteNode, ) {
+        if (noteNode.type() == NodeType.FOLDER) {
             activity?.let {
                 replaceFragment(it.supportFragmentManager, NotesFragment(db, noteNode.id()), false)
             }
@@ -96,35 +96,35 @@ class DirsFragment(
     }
 
     private fun onDeleteClick() {
-        dirsAdapter.getSelected()?.let { deleteDir(it.id()) }
+        foldersAdapter.getSelected()?.let { deleteFolder(it.id()) }
             ?: kotlin.run { context?.let { alert(it, "No item selected") } }
     }
 
-    private fun deleteDir(id: Long) {
+    private fun deleteFolder(id: Long) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val dir = db.directoryRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
-                dir.status = NodeStatus.DELETED.name
-                db.directoryRepository().update(dir)
+                val folder = db.folderRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
+                folder.status = NodeStatus.DELETED.name
+                db.folderRepository().update(folder)
             } catch (ex: Exception) {
-                context?.let { alert(it, "Dir not found") }
+                context?.let { alert(it, "Folder not found") }
             }
             MainScope().launch {
-                dirsAdapter.removeNoteNode(id)
+                foldersAdapter.removeNoteNode(id)
             }
         }
-        dirsAdapter.deselectAll()
+        foldersAdapter.deselectAll()
     }
 
     private fun onRestoreClick() {
         val idInput = EditText(context).apply { hint = "ID" }
         AlertDialog.Builder(context)
-            .setTitle("restore dir")
-            .setMessage("What is the id of dir that you want to restore?")
+            .setTitle("restore folder")
+            .setMessage("What is id of folder that you want to restore?")
             .setView(idInput)
             .setPositiveButton("Restore") { dialog, whichButton ->
                 idInput.text.toString().toLongOrNull()?.let {
-                    restoreDir(it)
+                    restoreFolder(it)
                 } ?: kotlin.run {
                     this.context?.let { alert(it, "Incorrect long id") }
                 }
@@ -133,14 +133,14 @@ class DirsFragment(
             .show()
     }
 
-    private fun restoreDir(id: Long) {
+    private fun restoreFolder(id: Long) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val dir = db.directoryRepository().findFirstByIdAndStatus(id, NodeStatus.DELETED.name)
-                dir.status = NodeStatus.ACTIVE.name
-                db.directoryRepository().update(dir)
+                val folder = db.folderRepository().findFirstByIdAndStatus(id, NodeStatus.DELETED.name)
+                folder.status = NodeStatus.ACTIVE.name
+                db.folderRepository().update(folder)
                 MainScope().launch {
-                    dirsAdapter.addNoteNode(dir)
+                    foldersAdapter.addNode(folder)
                 }
             } catch (ex: Exception) {
                 context?.let { alert(it, "Dir not found") }
@@ -151,33 +151,33 @@ class DirsFragment(
     private fun onCreateClick() {
         val titleInput = EditText(context).apply { hint = "Title" }
         AlertDialog.Builder(context)
-            .setTitle("create dir")
+            .setTitle("create folder")
             .setMessage("What title?")
             .setView(titleInput)
             .setPositiveButton("Create") { dialog, whichButton ->
                 val str = titleInput.text.toString()
-                createDir(str)
+                createFolder(str)
             }
             .setNegativeButton("Cancel") { dialog, whichButton -> }
             .show()
     }
 
-    private fun createDir(title: String) {
+    private fun createFolder(title: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val id = db.directoryRepository().insert(Directory(title = title))
-                val dir = db.directoryRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
+                val id = db.folderRepository().insert(Folder(title = title))
+                val folder = db.folderRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
                 MainScope().launch {
-                    dirsAdapter.addNoteNode(dir)
+                    foldersAdapter.addNode(folder)
                 }
             } catch (ex: Exception) {
-                context?.let { alert(it, "Cant create dir") }
+                context?.let { alert(it, "Cant create folder") }
             }
         }
     }
 
     private fun onUpdateClick() {
-        val selected = dirsAdapter.getSelected()
+        val selected = foldersAdapter.getSelected()
         if (selected == null) {
             context?.let { alert(it, "No item selected") }
             return
@@ -192,30 +192,30 @@ class DirsFragment(
             addView(titleInput)
         }
         AlertDialog.Builder(context)
-            .setTitle("update dir")
+            .setTitle("update folder")
             .setMessage("What is new title?")
             .setView(updateInput)
             .setPositiveButton("Update") { dialog, whichButton ->
-                  selected?.let { updateDir(it.id(), titleInput.text.toString()) }
+                  selected?.let { updateFolder(it.id(), titleInput.text.toString()) }
             }
             .setNegativeButton("Cancel") { dialog, whichButton -> }
             .show()
     }
 
-    private fun updateDir(id: Long, title: String) {
+    private fun updateFolder(id: Long, title: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val dir = db.directoryRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
-                dir.title = title
-                db.directoryRepository().update(dir)
+                val folder = db.folderRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
+                folder.title = title
+                db.folderRepository().update(folder)
                 MainScope().launch {
-                    dirsAdapter.replaceNoteNode(id, dir)
+                    foldersAdapter.replaceNode(id, folder)
                 }
             } catch (ex: Exception) {
-                context?.let { alert(it, "Dir not found") }
+                context?.let { alert(it, "Folder not found") }
             }
         }
-        dirsAdapter.deselectAll()
+        foldersAdapter.deselectAll()
     }
 
 

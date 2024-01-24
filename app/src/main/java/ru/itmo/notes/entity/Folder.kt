@@ -5,10 +5,10 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import ru.itmo.notes.enums.NodeStatus
-import ru.itmo.notes.enums.NoteNodeType
+import ru.itmo.notes.enums.NodeType
 
-@Entity(tableName = "DIRECTORY_TAB")
-data class Directory (
+@Entity(tableName = "FOLDER_TAB")
+data class Folder (
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
 
@@ -26,6 +26,6 @@ data class Directory (
     override fun title() = title
 
     @Ignore
-    override fun type() = NoteNodeType.DIRECTORY
+    override fun type() = NodeType.FOLDER
 
 }

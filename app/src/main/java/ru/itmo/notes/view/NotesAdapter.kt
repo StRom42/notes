@@ -23,7 +23,7 @@ class NotesAdapter(
 
     override fun onBindViewHolder(viewHolder: NoteViewHolder, position: Int) {
         val noteNode = nodes[position]
-        viewHolder.titleView.text = "${noteNode.id()}: ${noteNode.type().name} | ${noteNode.title()}"
+        viewHolder.titleView.text = " ${noteNode.title()} | ${noteNode.id()} ->"
         viewHolder.titleView.setOnClickListener { onClickListener(noteNode) }
         if (selected?.type() == noteNode.type() && selected?.id() == noteNode.id()) {
             viewHolder.titleView.setTextColor(Color.RED)
@@ -54,7 +54,7 @@ class NotesAdapter(
         nodes.addAll(newNodes)
     }
 
-    fun addNoteNode(node: NoteNode) {
+    fun addNode(node: NoteNode) {
         nodes.add(node)
         notifyDataSetChanged()
     }
@@ -65,7 +65,7 @@ class NotesAdapter(
         notifyDataSetChanged()
     }
 
-    fun replaceNoteNode(id: Long, noteNode: NoteNode) {
+    fun replaceNode(id: Long, noteNode: NoteNode) {
         val index = nodes.indexOfFirst { it.id() == id }
         nodes[index] = noteNode
         notifyDataSetChanged()

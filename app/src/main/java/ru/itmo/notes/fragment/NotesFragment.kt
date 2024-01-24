@@ -22,7 +22,7 @@ import ru.itmo.notes.config.DatabaseConfig
 import ru.itmo.notes.entity.Note
 import ru.itmo.notes.entity.NoteNode
 import ru.itmo.notes.enums.NodeStatus
-import ru.itmo.notes.enums.NoteNodeType
+import ru.itmo.notes.enums.NodeType
 import ru.itmo.notes.view.NotesAdapter
 
 class NotesFragment(
@@ -99,9 +99,9 @@ class NotesFragment(
     }
 
     private fun onNoteClick(noteNode: NoteNode) {
-        if (noteNode.type() == NoteNodeType.NOTE) {
+        if (noteNode.type() == NodeType.NOTE) {
             activity?.let {
-                replaceFragment(it.supportFragmentManager, NoteContentFragment(db, noteNode.id()), true)
+                replaceFragment(it.supportFragmentManager, ContentFragment(db, noteNode.id()), true)
             }
         }
     }
@@ -118,7 +118,7 @@ class NotesFragment(
                 dir.status = NodeStatus.DELETED.name
                 db.noteRepository().update(dir)
             } catch (ex: Exception) {
-                context?.let { alert(it, "Dir not found") }
+                context?.let { alert(it, "Note not found") }
             }
             MainScope().launch {
                 notesAdapter.removeNoteNode(id)
@@ -130,12 +130,12 @@ class NotesFragment(
     private fun onRestoreClick() {
         val idInput = EditText(context).apply { hint = "ID" }
         AlertDialog.Builder(context)
-            .setTitle("restore dir")
-            .setMessage("What is the id of dir that you want to restore?")
+            .setTitle("restore note")
+            .setMessage("What is the id of note that you want to restore?")
             .setView(idInput)
             .setPositiveButton("Restore") { dialog, whichButton ->
                 idInput.text.toString().toLongOrNull()?.let {
-                    restoreDir(it)
+                    restoreNote(it)
                 } ?: kotlin.run {
                     this.context?.let { alert(it, "Incorrect long id") }
                 }
@@ -144,17 +144,17 @@ class NotesFragment(
             .show()
     }
 
-    private fun restoreDir(id: Long) {
+    private fun restoreNote(id: Long) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val dir = db.noteRepository().findFirstByIdAndStatus(id, NodeStatus.DELETED.name)
                 dir.status = NodeStatus.ACTIVE.name
                 db.noteRepository().update(dir)
                 MainScope().launch {
-                    notesAdapter.addNoteNode(dir)
+                    notesAdapter.addNode(dir)
                 }
             } catch (ex: Exception) {
-                context?.let { alert(it, "Dir not found") }
+                context?.let { alert(it, "Note not found") }
             }
         }
     }
@@ -162,24 +162,24 @@ class NotesFragment(
     private fun onCreateClick() {
         val titleInput = EditText(context).apply { hint = "Title" }
         AlertDialog.Builder(context)
-            .setTitle("create dir")
+            .setTitle("create note")
             .setMessage("What title?")
             .setView(titleInput)
             .setPositiveButton("Create") { dialog, whichButton ->
                 val str = titleInput.text.toString()
-                createDir(str)
+                createNote(str)
             }
             .setNegativeButton("Cancel") { dialog, whichButton -> }
             .show()
     }
 
-    private fun createDir(title: String) {
+    private fun createNote(title: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val id = db.noteRepository().insert(Note(title = title, dirId = dirId))
+                val id = db.noteRepository().insert(Note(title = title, folderId = dirId))
                 val note = db.noteRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
                 MainScope().launch {
-                    notesAdapter.addNoteNode(note)
+                    notesAdapter.addNode(note)
                 }
             } catch (ex: Exception) {
                 context?.let { alert(it, "Cant create note") }
@@ -199,28 +199,28 @@ class NotesFragment(
             selected?.let { setText(it.title()) }
         }
         AlertDialog.Builder(context)
-            .setTitle("update dir")
+            .setTitle("update note name")
             .setMessage("What id and new title?")
             .setView(titleInput)
             .setPositiveButton("Update") { dialog, whichButton ->
 
-                selected?.let { updateDir(it.id(), titleInput.text.toString()) }
+                selected?.let { updateNote(it.id(), titleInput.text.toString()) }
             }
             .setNegativeButton("Cancel") { dialog, whichButton -> }
             .show()
     }
 
-    private fun updateDir(id: Long, title: String) {
+    private fun updateNote(id: Long, title: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val dir = db.noteRepository().findFirstByIdAndStatus(id, NodeStatus.ACTIVE.name)
                 dir.title = title
                 db.noteRepository().update(dir)
                 MainScope().launch {
-                    notesAdapter.replaceNoteNode(id, dir)
+                    notesAdapter.replaceNode(id, dir)
                 }
             } catch (ex: Exception) {
-                context?.let { alert(it, "Dir not found") }
+                context?.let { alert(it, "Note not found") }
             }
         }
         notesAdapter.deselectAll()

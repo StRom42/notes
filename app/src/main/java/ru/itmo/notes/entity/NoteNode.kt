@@ -1,6 +1,6 @@
 package ru.itmo.notes.entity
 
-import ru.itmo.notes.enums.NoteNodeType
+import ru.itmo.notes.enums.NodeType
 
 interface NoteNode {
 
@@ -8,6 +8,6 @@ interface NoteNode {
 
     fun title(): String
 
-    fun type(): NoteNodeType
+    fun type(): NodeType
 
 }

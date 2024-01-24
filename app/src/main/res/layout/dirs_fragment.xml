@@ -17,22 +17,22 @@
             android:id="@+id/add_dir_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="ADD DIR"/>
+            android:text="ADD"/>
         <Button
             android:id="@+id/delete_dir_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="DELETE DIR"/>
+            android:text="DELETE"/>
         <Button
             android:id="@+id/edit_dir_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="EDIT DIR"/>
+            android:text="EDIT NAME"/>
         <Button
             android:id="@+id/restore_dir_btn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="RESTORE DIR"/>
+            android:text="RESTORE"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

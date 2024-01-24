@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import ru.itmo.notes.common.addFragment
 import ru.itmo.notes.config.DatabaseConfig
-import ru.itmo.notes.fragment.DirsFragment
+import ru.itmo.notes.fragment.FoldersFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.main_layout)
 
-        addFragment(supportFragmentManager, DirsFragment(db), false)
+        addFragment(supportFragmentManager, FoldersFragment(db), false)
     }
 
 }

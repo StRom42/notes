@@ -6,15 +6,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import ru.itmo.notes.entity.Directory
 import ru.itmo.notes.entity.Note
-import ru.itmo.notes.enums.NodeStatus
 
 @Dao
 interface NoteRepository {
 
-    @Query("select * from note_tab where dir_id = :dirId and status = :status")
-    fun findAllByDirIdAndStatus(dirId: Long, status: String): List<Note>
+    @Query("select * from note_tab where folder_id = :folderId and status = :status")
+    fun findAllByDirIdAndStatus(folderId: Long, status: String): List<Note>
 
     @Query("select * from note_tab where id = :id and status = :status limit 1")
     fun findFirstByIdAndStatus(id: Long, status: String): Note

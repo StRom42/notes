@@ -8,24 +8,17 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.room.Room
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.itmo.notes.R
 import ru.itmo.notes.common.alert
-import ru.itmo.notes.common.replaceFragment
 import ru.itmo.notes.config.DatabaseConfig
 import ru.itmo.notes.entity.Note
-import ru.itmo.notes.entity.NoteNode
 import ru.itmo.notes.enums.NodeStatus
-import ru.itmo.notes.enums.NoteNodeType
-import ru.itmo.notes.view.NotesAdapter
 
-class NoteContentFragment(
+class ContentFragment(
     db: DatabaseConfig? = null,
     noteId: Long? = null
 ): Fragment() {
